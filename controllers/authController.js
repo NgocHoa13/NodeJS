@@ -17,8 +17,11 @@ const createSendToken = (user, statusCode, res) => {
         expires: new Date(
             Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
         ),
+        // Set the cookie's HttpOnly flag to ensure the cookie is
+        // not accessible through JS, making it immune to XSS attacks
         httpOnly: true
     };
+    //in production, set the cookie's secure flag to ensure the cookie is only sent over HTTPS
     if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
     res.cookie('jwt', token, cookieOptions);
 
@@ -113,7 +116,6 @@ exports.protect = catchAsync(async (req, res, next) => {
 //Only for rended pages, no error!
 exports.isLoggedIn = async (req, res, next) => {
     // 1) verify token
-
     if (req.cookies.jwt) {
         try {
             const decoded = await promisify(jwt.verify)(
@@ -171,7 +173,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
     const message = `Forgot your password? Submit a PATCH request with your new passwordConfirm to: ${resetURL}\nIf you didn't forget your password, please ignore this email`;
     try {
-        console.log('1');
         await sendEmail({
             email: user.email,
             subject: 'Your password reset token(valid for 10 min)',
