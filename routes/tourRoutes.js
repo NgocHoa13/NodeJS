@@ -5,6 +5,7 @@ const authController = require('./../controllers/authController');
 const reviewRouter = require('./../routes/reviewRoutes');
 
 const router = express.Router(); //router is a middleware
+
 // router.param('id', tourController.checkID);
 
 //create a checkbody middleware
@@ -50,6 +51,8 @@ router
     .patch(
         authController.protect,
         authController.restrictTo('admin', 'lead-guide'),
+        tourController.uploadTourImages,
+        tourController.resizeTourImages,
         tourController.updateTour
     )
     .delete(
