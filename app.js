@@ -7,6 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 const AppError = require('./utils/appErorr');
 const globalErrorHandler = require('./controllers/errorController');
@@ -52,6 +53,8 @@ app.use(
     })
 );
 
+app.use(compression());
+
 //Test middleware
 app.use((req, res, next) => {
     req.requestTime = new Date().toISOString();
@@ -70,7 +73,7 @@ app.all('*', (req, res, next) => {
     // const err = new Error(`Can't find ${req.originalUrl} on this server`);
     // err.status = 'fail';
     // err.statusCode = 404;
-    next(AppError(`Can't find ${req.originalUrl} on this server`, 404));
+    next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
 
 app.use(globalErrorHandler);
